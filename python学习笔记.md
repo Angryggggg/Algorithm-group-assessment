@@ -691,6 +691,8 @@ f.close()
 
 #### 一、类与对象
 
+[参考视频【7 分钟搞懂 Python 对象和类！零基础也能秒会🔥】](https://www.bilibili.com/video/BV1WQtmzcEn9?vd_source=2586376a3793b4ac3a8f2e9e7d405f7d)
+
 ##### 1.类与对象的概念
 
 - <mark><strong>类（class）</strong></mark>是对一类事物的<u><strong>抽象描述（模板）</strong></u>，规定了这类事物具有哪些数据（属性）和哪些行为（方法）。
@@ -753,7 +755,9 @@ f.close()
   	1000
 ```
 
-##### 2.继承
+##### 2.继承/扩展
+
+[【为什么要学 Python 继承？2 个视角 + Person / 学生 / 老师案例，讲透代码复用的核心】](https://www.bilibili.com/video/BV1jNHCzsERy?vd_source=2586376a3793b4ac3a8f2e9e7d405f7d)
 
 - 新类可以<u><strong>继承</strong></u>已有类的全部属性和方法，语法格式为`class <子类>(<父类>):`；子类可以<u><strong>新增</strong></u>自己的方法，也可以<u><strong>重写</strong></u>父类的方法。
 - 在子类中用`super().__init__(...)`可以<u><strong>调用父类的构造函数</strong></u>，完成父类部分的初始化。
@@ -772,13 +776,15 @@ f.close()
   	我是老师 王老师
 ```
 
-##### 3.多态
+##### 3.组合/多态
+
+[教学视频](https://www.bilibili.com/video/BV1LhptzLEnE?t=14.5)
 
 - 不同的类中定义了<u><strong>同名方法</strong></u>，调用同一方法时表现出<u><strong>不同的行为</strong></u>，称为<mark><strong>多态</strong></mark>。如上例中`Person`和`Teacher`都有`say()`方法，但输出不同，调用者无需区分对象具体属于哪一类。
 
 #### 三、结构体式用法
 
-##### 1.dataclass
+##### 1.`dataclass`
 
 - 只用来<u><strong>存放数据</strong></u>的类（相当于结构体），可以使用标准库`dataclasses`中的<u><strong>@dataclass</strong></u>装饰器：只需写出各字段及其类型，Python自动生成`__init__`等方法。
 
@@ -820,9 +826,10 @@ f.close()
 
 | 导入方式                      | 说明                                                         |
 | ----------------------------- | ------------------------------------------------------------ |
-| `import <模块名>`             | 导入整个模块，使用时要写`<模块名>.<名字>`                    |
-| `from <模块名> import <名字>` | 只导入模块中的某个名字，使用时<u><strong>不用加模块名前缀</strong></u> |
+| `import <模块名>`             | 导入**<u>整个</u>**模块，使用时要写`<模块名>.<名字>`         |
+| `from <模块名> import <名字>` | 只导入模块中的**<u>某个</u>**名字，使用时<u><strong>不用加模块名前缀</strong></u> |
 | `import <模块名> as <别名>`   | 给模块起一个别名，之后用别名代替模块名                       |
+| `from <模块名> import *`      | 导入**<u>整个</u>**模块，使用时不用写模块名，直接调用模块内的方法 |
 
 ```python
 >>> import math
@@ -837,6 +844,8 @@ f.close()
 ```
 
 ##### 2.`__name__`属性
+
+[详细解释](https://www.bilibili.com/video/BV1T8gTzGErR?t=4.4)
 
 - 每个模块都有一个内置变量`__name__`：模块被<u><strong>直接运行</strong></u>时，`__name__`的值为`"__main__"`；模块被<u><strong>导入</strong></u>时，`__name__`的值为模块名。因此常用下面的写法，使测试代码只在本文件被直接运行时才执行：
 
@@ -868,6 +877,6 @@ f.close()
 | `time`   | 时间处理，如`time()`、`sleep()`、`strftime()`     |
 | `os`     | 操作系统与文件路径，如`getcwd()`、`listdir()`     |
 | `sys`    | 程序运行环境，如`argv`命令行参数、`exit()`        |
-| `json`   | JSON数据的编码与解码                              |
+| `json`   | `JSON`数据的编码与解码                            |
 
 - 标准库<u><strong>无需安装</strong></u>，导入即可使用；第三方模块需要先用`pip install <模块名>`安装，之后再导入使用。
