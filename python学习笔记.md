@@ -347,3 +347,527 @@ for <变量名> in <元组>:
    {1：6,2：2,3：2,4：2,5：1}
 ```
 
+#### 四、文件
+
+##### 1.文件状态
+
+- 文件是一个**<u>==存储在辅助存储器==</u>**上的==**<u>数据序列</u>**==，可以**<u>==包含任何数据内容==</u>**。
+
+- 文件包括两种类型：。
+
+  (1)**文本文件**:一般由单一特定编码的**字符**组成，可以看作是存储在磁盘上的长字符串。
+
+  (2)**二进制文件**：没有统一的字符编码（**非字符**），文件内部数据的组织格式与文件用途有关。只能当作字节流，不能看作是字符串。
+
+```python
+#txt格式文件包含“中国是个伟大的国家！”
+>>>tf = open("7A.txt","rt")           #文本文件方式读取
+>>>print(tf.readline())
+>>>tf.close()
+   中国是个伟大的国家！
+>>>bf = open("7A.txt","rb")           #二进制文本方式读取
+>>>print(bf.readline())
+>>>bf.close()
+b'\xe4\xb8\xad\xe5\x9b\xbd\xe6\x98\xaf\xe4\xb8\xaa\xe4\xbc\x9f\xe5\xa4\xa7\xe7\x9a\x84\xe5\x9b\xbd\xe5\xae\xb6\xef\xbc\x81'
+```
+
+- Python对文件读写采用统一的操作步骤：“打开 - 操作 - 关闭”。
+
+  ##### 2.文件打开
+
+  - Python通过`open()`函数打开一个文件，采用`<文件变量>.close()`方法关闭文件。
+
+    `<变量名> = open(<文件名>,<打开模式>)`
+
+  | 文件的打开模式 | 含义                                                         |
+  | -------------- | ------------------------------------------------------------ |
+  | `'r'`          | **只读**模式，如果文件不存在，返回异常 `FileNotFoundError`，默认值 |
+  | `'w'`          | **覆盖写**模式，文件不存在则创建，存在则完全覆盖             |
+  | `'x'`          | **创建写**模式，文件不存在则创建，存在则返回异常 `FileExistsError` |
+  | `'a'`          | **追加写**模式，文件不存在则创建，存在则在文件最后追加内容   |
+  | `'b'`          | **二进制文件**模式                                           |
+  | `'t'`          | **文本文件**模式，默认值                                     |
+  | `'+'`          | 与 r/w/x/a 一同使用，在**原功能基础上增加**同时**读写**功能  |
+
+例如：open()函数**默认采用`rt`**(文本只读)模式，读入 `7A.txt` 文件：
+
+​	`tf = open('7A.txt','r')`或`tf = open('7A.txt')`
+
+读取一个二进制文件，如一张图片、一段视频或者一段音乐，需要使用文件打开模式`rb`。例如，打开一个名为”`music.mp3`”的音频文件:
+
+​	`bf = open(‘music.mp3’,’rb’)`
+
+- 文件**使用结束后要用close()方法关闭**，释放文件的使用授权。
+
+  `<文件变量名>.close()`
+
+- 使用保留字with和as以及open()函数，可以简化文件打开，无须显示关闭。（不用关闭文件，当程序退出with区域代码执行时，将**自动关闭**所打开的文件f）
+
+  ```python
+  with open(<文件名>,<打开方式>) as f：
+  	<文件操作>
+  ```
+
+```python
+with open("7A.txt","rt") as tf:
+    print(tf.readline())
+with open("7A.txt","rb") as bf:
+    print(bf.readline())
+```
+
+    ##### 2.文件编码
+
+- open() 函数存在第三个参数，可以**指定读取文件的字符编码**。
+
+  `<变量名> = open(<文件名>,<打开模式>,encoding=None)`
+
+- open()函数不使用encoding参数时，默认使用**操作系统当前的字符编码**，不同操作系统的当前编码可能不同，同一个操作系统在不同应用环境下的编码也可能不同。
+
+- 一般文本文件都采用`UTF-8`编码，标记为` utf-8`。为了避免文件打开时，文件编码与系统当前编码不一致，可以采用如下代码指定文件解析代码：
+
+  `<变量名> = open(<文件名>,<打开模式>,encoding='utf-8')`
+
+##### 3.文件读取
+
+- 文件打开后，可以用`read(),readline(),readlines()`函数进行读取。
+
+| 操作方法                     | 含义                                                         |
+| ---------------------------- | ------------------------------------------------------------ |
+| `<file>.read(size=-1)`       | 从文件中读入**整个文件内容**，如果给出参数，读入**前 size 长度**的字符串或字节流 |
+| `<file>.readline(size = -1)` | 从文件中读入**一行内容**，如果给出参数，读入该行**前 size 长度**的字符串或字节流 |
+| `<file>.readlines(hint=-1)`  | 从文件中读入**所有行**，以每行为元素形成一个**列表**，如果给出参数，读入 hint 行 |
+
+```python
+>>> f = open("7A.txt", "rt")
+>>> print(f.read(2))
+	中国
+>>> f.seek(0)                      #文章指针移到开头（第0个位置）
+>>> print(f.read())
+	中国是个伟大的国家！
+>>> f.close()
+```
+
+```python
+>>> f = open("7A.txt", "rt")
+>>> print(f.readline())
+	中国是个伟大的国家！
+>>> f.seek(0)
+>>> print(f.readlines())
+	['中国是个伟大的国家！']
+>>> f.close()
+```
+
+##### 4.文件写入
+
+- 打开文件后，可以用`write(),writelines()`函数**<u>写入数据</u>**，通过`seek()`函数**<u>控制文件写入位置</u>**。
+
+| 方法                       | 含义                                                         |
+| -------------------------- | ------------------------------------------------------------ |
+| `<file>.write(s)`          | 向文件写入**一个字符串或字节流**                             |
+| `<file>.writelines(lines)` | 将一个元素全为字符串的**列表(组合后）写入文件**              |
+| `<file>.seek(offset, w=0)` | 改变**当前文件操作指针的位置**到 `w+offsetw `的值：0— 文件开头；1— 当前位置；2— 文件结尾 |
+
+```python
+fname = input("请输入要写入的文件：")
+f = open(fname, "w+")
+ls = ["唐诗", "宋词", "元曲"]
+f.writelines(ls)
+f.close()                         #此时打开对应文件显示"唐诗宋词元曲"
+```
+
+##### 5.文件遍历
+
+- 使用`for-in`遍历循环能够**<u>遍历文件内容</u>**。
+
+(1)第一种方式：使用`readlines()`函数按行读入全部内容，再逐个遍历列表的每个元素。
+
+`for line in f.readlines():                 #处理一行数据`
+
+(2)第二种方式：直接使用文件描述符，按行遍历。
+
+`for line in f.read():                      #处理一行数据`
+
+```python
+fname = input("请输入要打开的文件：")
+f = open(fname, "r")
+for line in f.readlines():                    #每一行内容形成单独列表，占很大内存
+    print(line)
+f.close()  
+```
+
+```python
+fname = input("请输入要打开的文件：")
+f = open(fname, "r")
+for line in f:                               #改进为逐行读入
+    print(line)
+f.close()
+```
+
+### 函数
+
+函数是一段<mark><strong>可以重复使用的代码</strong></mark>，用于完成一个相对独立的功能。使用函数可以提高代码的复用率，使程序结构更清晰、更容易维护。
+
+#### 一、函数的定义与调用
+
+##### 1.函数的定义
+
+- Python使用关键字<u><strong>def</strong></u>定义函数，语法格式如下：
+
+```python
+  def <函数名>(<形参列表>):
+      <函数体>
+      return <返回值>
+```
+
+- 定义函数时，括号中列出的参数称为<mark><strong>形式参数（形参）</strong></mark>，只是函数内部使用的变量名，本身没有具体的值。
+- 函数定义只是完成声明，<u><strong>不会执行</strong></u>函数体；只有函数被<u><strong>调用</strong></u>时，函数体才被执行。
+- `return`语句用于<u><strong>结束函数</strong></u>并<u><strong>返回结果</strong></u>；没有`return`语句，或`return`后不带值时，函数返回`None`。
+
+```python
+  >>> def add(a, b):          # a、b是形参
+  ...     return a + b
+  >>> add(3, 5)               # 调用函数，3、5是实参
+  	8
+```
+
+##### 2.实参与形参
+
+- 调用函数时传入的具体值称为<mark><strong>实际参数（实参）</strong></mark>，调用时实参的值被<u><strong>传递</strong></u>给对应的形参，函数体中对形参的操作就是对实参的值进行运算。
+- 参数传递的实质是把实参对象的<u><strong>引用</strong></u>赋给形参，因此：
+
+  （1）实参是<u><strong>不可变类型</strong></u>（整数、字符串、元组）时，函数内对形参重新赋值，<u><strong>不影响</strong></u>实参；
+
+  （2）实参是<u><strong>可变类型</strong></u>（列表、字典、集合）时，函数内对形参所指对象进行修改，<u><strong>会影响</strong></u>实参。
+
+```python
+  >>> def change(a, ls):
+  ...     a = 100
+  ...     ls.append(4)
+  >>> x = 1
+  >>> y = [1, 2, 3]
+  >>> change(x, y)
+  >>> x
+  	1
+  >>> y
+  	[1, 2, 3, 4]
+```
+
+##### 3.参数的传递方式
+
+| 传递方式           | 说明                                                         |
+| ------------------ | ------------------------------------------------------------ |
+| 位置参数           | 调用时实参按<u><strong>顺序</strong></u>与形参一一对应，个数和顺序都不能错 |
+| 关键字参数         | 调用时用`<形参名>=<值>`的形式指定，<u><strong>不受顺序限制</strong></u> |
+| 默认值参数         | 定义时给形参设定<u><strong>默认值</strong></u>，调用时可省略该实参；默认值参数必须写在普通参数<u><strong>之后</strong></u> |
+| 可变参数`*args`    | 接收任意多个位置参数，在函数内打包为<u><strong>元组</strong></u> |
+| 可变参数`**kwargs` | 接收任意多个关键字参数，在函数内打包为<u><strong>字典</strong></u> |
+
+```python
+>>> def greet(name, greeting="你好"):     # greeting是默认值参数
+...     return greeting + "，" + name
+>>> greet("小明")                          # 位置参数，greeting取默认值
+	'你好，小明'
+>>> greet("小明", "早上好")
+	'早上好，小明'
+>>> greet(greeting="欢迎", name="小红")   # 关键字参数
+	'欢迎，小红'
+>>> def total(*args):                      # *args接收任意多个位置参数
+...     return sum(args)
+>>> total(1, 2, 3, 4)
+	10
+>>> def info(**kwargs):                    # **kwargs接收任意多个关键字参数
+...     return kwargs
+>>> info(name="小明", age=18)
+	{'name': '小明', 'age': 18}
+```
+
+##### 4.函数的返回值
+
+- `return`可以返回<u><strong>多个值</strong></u>，本质上是把多个值打包成一个<u><strong>元组</strong></u>返回，调用处可用多变量同步赋值接收。
+
+```python
+  >>> def func(x):
+  ...     return x, x**2, x**3
+  >>> func(2)
+  	(2, 4, 8)
+  >>> a, b, c = func(2)
+  >>> a, b, c
+  	(2, 4, 8)
+```
+
+#### 二、变量的作用域
+
+##### 1.局部变量与全局变量
+
+- 在函数<u><strong>内部</strong></u>定义的变量称为<mark><strong>局部变量</strong></mark>，只能在该函数内部使用，函数执行结束即被释放。
+- 在函数<u><strong>外部</strong></u>定义的变量称为<mark><strong>全局变量</strong></mark>，在整个程序范围内都可以访问，<u>但函数内部默认只能<strong>读取</strong></u>，不能直接修改。
+- 函数内部要修改全局变量，必须先用关键字<u><strong>global</strong></u>声明。
+
+```python
+  >>> count = 0
+  >>> def inc():
+  ...     global count
+  ...     count += 1
+  >>> inc()
+  >>> count
+  	1
+```
+
+#### 三、函数的嵌套与闭包
+
+##### 1.嵌套函数
+
+- 在一个函数的<u><strong>内部再定义</strong></u>另一个函数，称为函数的嵌套；内层函数只能在外层函数内部被调用，外部无法直接访问。
+
+```python
+  >>> def outer():
+  ...     print("外层函数")
+  ...     def inner():
+  ...         print("内层函数")
+  ...     inner()          # 只能在outer内部调用
+  >>> outer()
+  	外层函数
+  	内层函数
+```
+
+##### 2.闭包
+
+- 如果内层函数<u><strong>引用了外层函数的局部变量</strong></u>，并且外层函数把内层函数作为<u><strong>返回值</strong></u>返回，那么这个内层函数就是<mark><strong>闭包</strong></mark>。
+- 闭包形成后，外层函数的局部变量<u><strong>不会被释放</strong></u>，而是被内层函数"记住"，每次调用内层函数都能在上次的基础上继续使用。
+- 内层函数要<u><strong>修改</strong></u>外层函数的局部变量，必须先用关键字<u><strong>nonlocal</strong></u>声明。
+
+```python
+  >>> def make_counter():        # 计数器：每调用一次返回的函数，计数加1
+  ...     count = 0
+  ...     def inc():
+  ...         nonlocal count     # 声明count是外层函数的变量
+  ...         count += 1
+  ...         return count
+  ...     return inc             # 返回内层函数，形成闭包
+  >>> c = make_counter()
+  >>> c()                        # count被记住，不随make_counter结束而消失
+  	1
+  >>> c()
+  	2
+  >>> c()
+  	3
+```
+
+- 闭包主要用于：<u><strong>保存状态</strong></u>（如计数器）、<u><strong>代替简单的类</strong></u>等场景。
+
+#### 四、递归函数与匿名函数
+
+##### 1.递归函数
+
+- 函数在执行过程中<u><strong>调用自身</strong></u>，称为递归；递归必须有明确的<u><strong>终止条件（出口）</strong></u>，否则会无限递归下去，导致栈溢出。
+
+```python
+  >>> def fact(n):               # 计算n的阶乘
+  ...     if n == 1:             # 终止条件
+  ...         return 1
+  ...     return n * fact(n - 1)
+  >>> fact(5)
+  	120
+```
+
+##### 2.lambda匿名函数
+
+- 使用关键字<u><strong>lambda</strong></u>可以定义没有名字的<u><strong>匿名函数</strong></u>，语法格式为`lambda <参数>: <表达式>`，只能写<u><strong>一个表达式</strong></u>，表达式的运算结果即为返回值，不用写`return`。
+
+```python
+  >>> add = lambda a, b: a + b
+  >>> add(3, 5)
+  	8
+  >>> ls = [("小明", 85), ("小红", 92), ("小刚", 78)]
+  >>> sorted(ls, key=lambda x: x[1])     # 按成绩排序，lambda常用作key参数
+  	[('小刚', 78), ('小明', 85), ('小红', 92)]
+```
+
+- lambda主要适用于<u><strong>逻辑简单、只使用一次</strong></u>的小函数，如作为`sorted()`、`max()`等函数的`key`参数；逻辑复杂时应使用`def`定义普通函数。
+
+### 面向对象
+
+面向对象是一种编程思想：把<u><strong>数据</strong></u>和<u><strong>操作数据的函数</strong></u>打包成一个整体（对象），程序由对象之间的相互作用组成。Python中<mark><strong>一切皆对象</strong></mark>，整数、字符串、列表等都是对象。
+
+#### 一、类与对象
+
+##### 1.类与对象的概念
+
+- <mark><strong>类（class）</strong></mark>是对一类事物的<u><strong>抽象描述（模板）</strong></u>，规定了这类事物具有哪些数据（属性）和哪些行为（方法）。
+- <mark><strong>对象（实例）</strong></mark>是按类这个模板创建出来的<u><strong>具体个体</strong></u>，每个对象有自己的一份属性值。
+- Python<u><strong>没有</strong></u>C语言那样的结构体（`struct`）关键字；C语言中用结构体把几个相关数据打包在一起，在Python中就是用<u><strong>类</strong></u>来实现，只存数据时还可以使用`dataclass`（见本节第三部分）。
+
+##### 2.类的定义
+
+- 使用关键字<u><strong>class</strong></u>定义类，类名一般采用<u><strong>首字母大写</strong></u>的命名方式。
+
+```python
+  class Student:                         # 定义类
+      school = "中南民族大学"            # 类属性，所有对象共享
+      def __init__(self, name, score):   # 构造函数
+          self.name = name                 # 实例属性，每个对象各有一份
+          self.score = score
+      def show(self):                      # 实例方法
+          print(self.name, self.score)
+```
+
+##### 3.构造函数
+
+- `__init__`是类的<mark><strong>构造函数</strong></mark>，在<u><strong>创建对象时自动调用</strong></u>，用于给新对象设置初始属性值，作用相当于C++、Java中与类同名的构造函数。
+- 方法的第一个参数固定写<u><strong>self</strong></u>，表示<u><strong>对象本身</strong></u>，通过`self.<属性名>`可以访问该对象的属性；`self`由Python自动传入，调用时<u><strong>不用也不能</strong></u>手动传递。
+- 创建对象（实例化）的语法为`<对象名> = <类名>(<实参>)`，括号中的实参对应`__init__`中除`self`之外的形参。
+
+```python
+  >>> s = Student("张三", 90)     # 创建对象，自动调用__init__
+  >>> s.name                      # 访问实例属性
+  	'张三'
+  >>> s.show()                    # 调用实例方法
+  	张三 90
+  >>> s.school                    # 类属性可以通过对象访问
+  	'中南民族大学'
+```
+
+##### 4.属性与方法
+
+| 名称     | 说明                                                         |
+| -------- | ------------------------------------------------------------ |
+| 实例属性 | 在`__init__`中以`self.<名>`的形式定义，<u><strong>每个对象各有一份</strong></u>，互不影响 |
+| 类属性   | 直接定义在类中，<u><strong>所有对象共享一份</strong></u>，可以用`<类名>.<属性>`访问 |
+| 实例方法 | 定义在类中的普通函数，第一个参数是`self`，用`<对象>.<方法>()`调用 |
+
+#### 二、面向对象的三大特性
+
+##### 1.封装
+
+- 把属性和方法打包在类内部，外部通过对象的方法来操作数据，称为<mark><strong>封装</strong></mark>。
+- 属性名以<u><strong>双下划线`__`开头</strong></u>时，该属性被设为<u><strong>私有属性</strong></u>，不能在类外部直接访问，只能通过类内的方法间接使用，起到保护数据的作用。
+
+```python
+  >>> class Account:
+  ...     def __init__(self, balance):
+  ...         self.__balance = balance     # 私有属性
+  ...     def get_balance(self):
+  ...         return self.__balance
+  >>> a = Account(1000)
+  >>> a.get_balance()
+  	1000
+```
+
+##### 2.继承
+
+- 新类可以<u><strong>继承</strong></u>已有类的全部属性和方法，语法格式为`class <子类>(<父类>):`；子类可以<u><strong>新增</strong></u>自己的方法，也可以<u><strong>重写</strong></u>父类的方法。
+- 在子类中用`super().__init__(...)`可以<u><strong>调用父类的构造函数</strong></u>，完成父类部分的初始化。
+
+```python
+  >>> class Person:
+  ...     def __init__(self, name):
+  ...         self.name = name
+  ...     def say(self):
+  ...         print("我是", self.name)
+  >>> class Teacher(Person):           # Teacher继承Person
+  ...     def say(self):               # 重写父类的say方法
+  ...         print("我是老师", self.name)
+  >>> t = Teacher("王老师")            # __init__继承自父类
+  >>> t.say()
+  	我是老师 王老师
+```
+
+##### 3.多态
+
+- 不同的类中定义了<u><strong>同名方法</strong></u>，调用同一方法时表现出<u><strong>不同的行为</strong></u>，称为<mark><strong>多态</strong></mark>。如上例中`Person`和`Teacher`都有`say()`方法，但输出不同，调用者无需区分对象具体属于哪一类。
+
+#### 三、结构体式用法
+
+##### 1.dataclass
+
+- 只用来<u><strong>存放数据</strong></u>的类（相当于结构体），可以使用标准库`dataclasses`中的<u><strong>@dataclass</strong></u>装饰器：只需写出各字段及其类型，Python自动生成`__init__`等方法。
+
+```python
+  >>> from dataclasses import dataclass
+  >>> @dataclass
+  ... class Point:
+  ...     x: int
+  ...     y: int
+  >>> p = Point(3, 4)
+  >>> p
+  	Point(x=3, y=4)
+  >>> p.x
+  	3
+```
+
+##### 2.命名元组
+
+- `collections.namedtuple`可以创建<u><strong>带字段名的元组</strong></u>，用法类似结构体，但和元组一样<u><strong>不可修改</strong></u>。
+
+```python
+  >>> from collections import namedtuple
+  >>> StudentT = namedtuple("StudentT", ["name", "score"])
+  >>> s = StudentT("李四", 88)
+  >>> s.name          # 可以按字段名访问
+  	'李四'
+  >>> s[1]            # 也可以按索引访问
+  	88
+```
+
+### 模块与包
+
+#### 一、模块
+
+##### 1.模块的导入
+
+- 一个`.py`文件就是一个<mark><strong>模块</strong></mark>。把代码拆分到多个模块中，可以<u><strong>复用代码</strong></u>，便于多人协作和维护；Python自带的大量模块合称为<u><strong>标准库</strong></u>。
+- 使用模块前必须先用`import`导入，常用的导入方式有三种：
+
+| 导入方式                      | 说明                                                         |
+| ----------------------------- | ------------------------------------------------------------ |
+| `import <模块名>`             | 导入整个模块，使用时要写`<模块名>.<名字>`                    |
+| `from <模块名> import <名字>` | 只导入模块中的某个名字，使用时<u><strong>不用加模块名前缀</strong></u> |
+| `import <模块名> as <别名>`   | 给模块起一个别名，之后用别名代替模块名                       |
+
+```python
+>>> import math
+>>> math.sqrt(16)
+	4.0
+>>> from math import pi
+>>> pi
+	3.141592653589793
+>>> import math as m
+>>> m.floor(3.7)
+	3
+```
+
+##### 2.`__name__`属性
+
+- 每个模块都有一个内置变量`__name__`：模块被<u><strong>直接运行</strong></u>时，`__name__`的值为`"__main__"`；模块被<u><strong>导入</strong></u>时，`__name__`的值为模块名。因此常用下面的写法，使测试代码只在本文件被直接运行时才执行：
+
+```python
+  if __name__ == "__main__":
+      <测试代码>
+```
+
+#### 二、包
+
+##### 1.包的概念与导入
+
+- <mark><strong>包</strong></mark>是用来组织多个模块的<u><strong>文件夹</strong></u>，文件夹中通常包含一个`__init__.py`文件（可以为空），表示该文件夹是一个包。
+- 导入包中的模块使用<u><strong>点号</strong></u>表示层级，语法为`import <包名>.<模块名>`，使用时也要写全`<包名>.<模块名>.<名字>`。
+
+```python
+  import mypackage.mymath        # 导入mypackage包中的mymath模块
+  mypackage.mymath.add(3, 5)
+```
+
+- 包主要用于把功能相近的模块<u><strong>分门别类</strong></u>存放，避免模块重名冲突。
+
+#### 三、常用标准库
+
+| 模块     | 用途                                              |
+| -------- | ------------------------------------------------- |
+| `math`   | 数学函数，如`sqrt()`、`sin()`，以及常数`pi`、`e`  |
+| `random` | 随机数，如`random()`、`randint(a, b)`、`choice()` |
+| `time`   | 时间处理，如`time()`、`sleep()`、`strftime()`     |
+| `os`     | 操作系统与文件路径，如`getcwd()`、`listdir()`     |
+| `sys`    | 程序运行环境，如`argv`命令行参数、`exit()`        |
+| `json`   | JSON数据的编码与解码                              |
+
+- 标准库<u><strong>无需安装</strong></u>，导入即可使用；第三方模块需要先用`pip install <模块名>`安装，之后再导入使用。
